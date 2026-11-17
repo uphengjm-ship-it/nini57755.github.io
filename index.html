@@ -1,0 +1,63 @@
+<!doctype html><html lang="km"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>GOLD AI ANALYZER</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;600&family=Fraunces:wght@600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f6f4ee;--p:#fff;--tx:#1b1a17;--mu:#6d6a60;--ln:#dcd7c8;--au:#a8791a;--up:#1b7a4b;--dn:#b3261e}
+@media(prefers-color-scheme:dark){:root{--bg:#12110e;--p:#1b1a16;--tx:#efeadb;--mu:#9b968a;--ln:#33302a;--au:#e0b04a;--up:#4cc58a;--dn:#ef6b62}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.6 "Noto Sans Khmer",system-ui,sans-serif;padding:env(safe-area-inset-top) 0 40px}
+main{max-width:980px;margin:auto;padding:16px}header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+h1{font:600 22px Fraunces,serif;margin:0;color:var(--au)}button,input{font:inherit;color:var(--tx);background:var(--p);border:1px solid var(--ln);border-radius:6px;padding:6px 12px}
+button{cursor:pointer}button:focus-visible,input:focus-visible{outline:2px solid var(--au)}button.pri{background:var(--au);color:#fff;border-color:var(--au)}
+.price{font:600 44px Fraunces,serif;margin:14px 0 0}.mu{color:var(--mu);font-size:13px}.up{color:var(--up)}.dn{color:var(--dn)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.c{background:var(--p);border:1px solid var(--ln);border-radius:8px;padding:12px}.c b{display:block;font-size:18px}
+.box{background:var(--p);border:1px solid var(--ln);border-radius:8px;padding:14px;margin:12px 0}
+.sig{font:600 26px Fraunces,serif}pre{white-space:pre-wrap;font:inherit;margin:0}.row{display:flex;gap:8px;flex-wrap:wrap}
+</style></head><body><main>
+<header><h1>GOLD AI ANALYZER</h1><div class="row"><button id="lg">English</button><button id="rf" data-i="refresh"></button></div></header>
+<div class="mu" id="src"></div>
+<div class="price"><span id="px">—</span> <span class="mu">XAU/USD</span></div><div id="chg" class="mu"></div>
+<div class="box"><canvas id="ch" height="220"></canvas></div>
+<div class="grid" id="ind"></div>
+<div class="box"><div class="mu" data-i="signal"></div><div class="sig" id="sg"></div><pre id="rs" class="mu"></pre></div>
+<div class="box"><b data-i="levels"></b><pre id="lv"></pre></div>
+<div class="box"><b data-i="macro"></b><pre id="mc"></pre></div>
+<div class="box"><b data-i="ai"></b><div class="row" style="margin:8px 0"><input id="key" type="password" placeholder="sk-ant-... (optional)" style="flex:1;min-width:180px"><button id="sv" data-i="save"></button><button class="pri" id="ru" data-i="run"></button></div><pre id="ao"></pre></div>
+<p class="mu" data-i="disc"></p></main>
+<script>
+const T={km:{refresh:"ធ្វើបច្ចុប្បន្នភាព",signal:"សញ្ញាសរុប",levels:"កម្រិតសំខាន់ៗ",macro:"ម៉ាក្រូ (ដុល្លារ និងអត្រាការប្រាក់)",ai:"ការវិភាគ AI (Claude)",save:"រក្សាទុក Key",run:"វិភាគដោយ AI",disc:"មិនមែនជាដំបូន្មានវិនិយោគទេ។ ទិន្នន័យអាចយឺត។",buy:"ទិញ",sell:"លក់",neu:"រង់ចាំ",nokey:"បញ្ចូល API key ជាមុនសិន។",load:"កំពុងវិភាគ…",err:"កំហុស៖ ",src:"ប្រភព៖ ",sup:"ជំនួយ 20 ថ្ងៃ",res:"តស៊ូ 20 ថ្ងៃ",sl:"Stop-loss (2×ATR)",tp:"Target (3×ATR)",nd:"មិនមានទិន្នន័យ។ សូមចុចធ្វើបច្ចុប្បន្នភាពម្តងទៀត។",dx:"DXY",ty:"US10Y",tr:"និន្នាការ 20 ថ្ងៃ"},
+en:{refresh:"Refresh",signal:"Composite signal",levels:"Key levels",macro:"Macro (USD & yields)",ai:"AI analysis (Claude)",save:"Save key",run:"Analyze with AI",disc:"Not financial advice. Data may be delayed.",buy:"BUY",sell:"SELL",neu:"NEUTRAL",nokey:"Enter an API key first.",load:"Analyzing…",err:"Error: ",src:"Source: ",sup:"20d support",res:"20d resistance",sl:"Stop-loss (2×ATR)",tp:"Target (3×ATR)",nd:"No data yet. Try refreshing.",dx:"DXY",ty:"US10Y",tr:"20d trend"}};
+let L=localStorage.lang||"km",D=null,A=null,chart;const $=i=>document.getElementById(i),t=k=>T[L][k];
+const sma=(a,n)=>a.slice(-n).reduce((x,y)=>x+y,0)/n;
+const ema=(a,n)=>{const k=2/(n+1);let e=a[0];return a.map(v=>e=v*k+e*(1-k))};
+function rsi(c,n=14){let g=0,l=0;for(let i=1;i<=n;i++){const d=c[i]-c[i-1];d>0?g+=d:l-=d}g/=n;l/=n;for(let i=n+1;i<c.length;i++){const d=c[i]-c[i-1];g=(g*(n-1)+Math.max(d,0))/n;l=(l*(n-1)+Math.max(-d,0))/n}return 100-100/(1+g/(l||1e-9))}
+function atr(d,n=14){const tr=d.map((x,i)=>i?Math.max(x.h-x.l,Math.abs(x.h-d[i-1].c),Math.abs(x.l-d[i-1].c)):x.h-x.l);return sma(tr,n)}
+function analyze(g){const c=g.map(x=>x.c),last=c.at(-1),r=rsi(c),s20=sma(c,20),s50=sma(c,50),s200=c.length>=200?sma(c,200):null;
+const e12=ema(c,12),e26=ema(c,26),m=e12.map((v,i)=>v-e26[i]),sg=ema(m,9),mh=m.at(-1)-sg.at(-1);
+const sd=Math.sqrt(c.slice(-20).reduce((a,v)=>a+(v-s20)**2,0)/20),bu=s20+2*sd,bl=s20-2*sd,a=atr(g);
+let sc=0,why=[];const add=(v,s)=>{sc+=v;why.push((v>0?"+":v<0?"−":"·")+" "+s)};
+add(last>s50?1:-1,`Price vs SMA50 (${s50.toFixed(1)})`);add(s20>s50?1:-1,"SMA20 vs SMA50");if(s200)add(last>s200?1:-1,`Price vs SMA200 (${s200.toFixed(1)})`);
+add(mh>0?1:-1,`MACD hist ${mh.toFixed(2)}`);add(r<30?1:r>70?-1:0,`RSI ${r.toFixed(1)}`);add(last<bl?1:last>bu?-1:0,"Bollinger");
+const w=g.slice(-20);return{last,r,s20,s50,s200,mh,bu,bl,a,sc,why,sup:Math.min(...w.map(x=>x.l)),res:Math.max(...w.map(x=>x.h)),n:why.length}}
+const trend=a=>a.length>20?(a.at(-1).c/a.at(-21).c-1)*100:0;
+const f=(v,d=2)=>v==null?"—":v.toFixed(d);
+function ui(){document.documentElement.lang=L;$("lg").textContent=L=="km"?"English":"ខ្មែរ";document.querySelectorAll("[data-i]").forEach(e=>e.textContent=t(e.dataset.i));if(D)render()}
+function render(){const g=D.gold;if(g.length<30){$("rs").textContent=t("nd");return}
+$("src").textContent=t("src")+D.source+" · "+D.updated;const x=A=analyze(g);
+$("px").textContent=f(x.last);const p=g.at(-2).c,ch=x.last-p;$("chg").innerHTML=`<span class="${ch>=0?"up":"dn"}">${ch>=0?"▲":"▼"} ${f(ch)} (${f(ch/p*100)}%)</span>`;
+$("ind").innerHTML=[["RSI 14",f(x.r,1)],["SMA 20",f(x.s20)],["SMA 50",f(x.s50)],["SMA 200",f(x.s200)],["MACD",f(x.mh)],["ATR 14",f(x.a)],["BB ↑",f(x.bu)],["BB ↓",f(x.bl)]].map(([k,v])=>`<div class="c"><span class="mu">${k}</span><b>${v}</b></div>`).join("");
+const s=x.sc>=2?"buy":x.sc<=-2?"sell":"neu";$("sg").textContent=t(s)+` (${x.sc>0?"+":""}${x.sc}/${x.n})`;$("sg").className="sig "+(s=="buy"?"up":s=="sell"?"dn":"");$("rs").textContent=x.why.join("\n");
+const dir=x.sc>=0?1:-1;$("lv").textContent=`${t("sup")}: ${f(x.sup)}\n${t("res")}: ${f(x.res)}\n${t("sl")}: ${f(x.last-dir*2*x.a)}\n${t("tp")}: ${f(x.last+dir*3*x.a)}`;
+const dt=trend(D.dxy),yt=trend(D.us10y);$("mc").textContent=`${t("dx")}: ${f(D.dxy.at(-1)?.c)} (${t("tr")} ${f(dt,1)}%)\n${t("ty")}: ${f(D.us10y.at(-1)?.c)}% (${t("tr")} ${f(yt,1)}%)\n`+(dt+yt>0?(L=="km"?"ដុល្លារ/អត្រាកើន → សម្ពាធលើមាស":"Rising USD/yields → headwind for gold"):(L=="km"?"ដុល្លារ/អត្រាធ្លាក់ → គាំទ្រមាស":"Falling USD/yields → tailwind for gold"));
+const lab=g.slice(-120).map(v=>new Date(v.t).toLocaleDateString()),cl=g.map(v=>v.c);chart?.destroy();
+const ser=(a,n)=>a.map((_,i)=>i>=n-1?sma(a.slice(0,i+1),n):null).slice(-120);
+chart=new Chart($("ch"),{type:"line",data:{labels:lab,datasets:[{label:"XAU",data:cl.slice(-120),borderColor:"#a8791a",pointRadius:0,borderWidth:2},{label:"SMA20",data:ser(cl,20),borderColor:"#1b7a4b",pointRadius:0,borderWidth:1},{label:"SMA50",data:ser(cl,50),borderColor:"#b3261e",pointRadius:0,borderWidth:1}]},options:{animation:false,scales:{x:{display:false}}}})}
+async function load(){try{D=await (await fetch("/api/market")).json()}catch(e){D={gold:[],dxy:[],us10y:[],updated:"",source:""}}ui()}
+$("lg").onclick=()=>{L=L=="km"?"en":"km";localStorage.lang=L;ui()};$("rf").onclick=load;
+$("key").value=localStorage.k||"";$("sv").onclick=()=>localStorage.k=$("key").value;
+$("ru").onclick=async()=>{const k=$("key").value;if(!A)return;$("ao").textContent=t("load");
+const sum=JSON.stringify({price:A.last,rsi:A.r,sma20:A.s20,sma50:A.s50,sma200:A.s200,macdHist:A.mh,atr:A.a,support:A.sup,resistance:A.res,score:A.sc,dxy20dPct:trend(D.dxy),us10y20dPct:trend(D.us10y)});
+try{const r=await fetch("/api/ai",{method:"POST",headers:{"content-type":"application/json","x-user-key":k},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1200,system:"You are an institutional precious-metals strategist. Use only the data given. Give: regime, bias, key levels, risks, scenarios with invalidation. Be concise. Include a not-financial-advice note. Reply in "+(L=="km"?"Khmer":"English")+".",messages:[{role:"user",content:sum}]})});const j=await r.json();if(j.error)throw new Error(j.error.message);$("ao").textContent=j.content.map(c=>c.text||"").join("")}catch(e){$("ao").textContent=t("err")+e.message}};
+ui();load();
+</script></body></html>
