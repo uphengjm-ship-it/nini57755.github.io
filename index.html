@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="km">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>សួស្តីអ្នកទាំងអស់គ្នា | វេបសាយរបស់ខ្ញុំ</title>
+  <meta name="description" content="សួស្តីអ្នកទាំងអស់គ្នា មកកាន់វេបសាយរបស់ខ្ញុំ">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/victorya-khmer.woff" as="font" type="font/woff" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="kc-page">
+
+    <!-- ១) សារស្វាគមន៍ -->
+    <header class="kc-welcome">
+      <i class="kc-s kc-s1" aria-hidden="true"></i>
+      <i class="kc-s kc-s2" aria-hidden="true"></i>
+      <i class="kc-s kc-s3" aria-hidden="true"></i>
+      <i class="kc-s kc-s4" aria-hidden="true"></i>
+      <h1><span class="kc-w1">សួស្តីអ្នកទាំងអស់គ្នា</span> <span class="kc-w2">មកកាន់វេបសាយរបស់ខ្ញុំ</span></h1>
+    </header>
+
+    <!-- ២) ម៉ាស៊ីនគិតលេខ -->
+    <section class="kc-calc-section" aria-label="ម៉ាស៊ីនគិតលេខ">
+      <div class="kc-calc" id="kc-calc" tabindex="0">
+        <div class="kc-title">ម៉ាស៊ីនគិតលេខ</div>
+
+        <div class="kc-screen">
+          <div class="kc-expr" id="kc-expr"></div>
+          <div class="kc-value" id="kc-value">០</div>
+        </div>
+
+        <div class="kc-keys" id="kc-keys">
+          <button type="button" class="kc-fn" data-k="C">លុប</button>
+          <button type="button" class="kc-fn" data-k="B" aria-label="លុបខ្ទង់ចុងក្រោយ">&#9003;</button>
+          <button type="button" class="kc-fn" data-k="%">%</button>
+          <button type="button" class="kc-op" data-k="/" aria-label="ចែក">&divide;</button>
+
+          <button type="button" data-k="7">៧</button>
+          <button type="button" data-k="8">៨</button>
+          <button type="button" data-k="9">៩</button>
+          <button type="button" class="kc-op" data-k="*" aria-label="គុណ">&times;</button>
+
+          <button type="button" data-k="4">៤</button>
+          <button type="button" data-k="5">៥</button>
+          <button type="button" data-k="6">៦</button>
+          <button type="button" class="kc-op" data-k="-" aria-label="ដក">&minus;</button>
+
+          <button type="button" data-k="1">១</button>
+          <button type="button" data-k="2">២</button>
+          <button type="button" data-k="3">៣</button>
+          <button type="button" class="kc-op" data-k="+" aria-label="បូក">+</button>
+
+          <button type="button" data-k="N" aria-label="ប្តូរវិជ្ជមាន អវិជ្ជមាន">&plusmn;</button>
+          <button type="button" data-k="0">០</button>
+          <button type="button" data-k="." aria-label="ចំណុចទសភាគ">.</button>
+          <button type="button" class="kc-eq" data-k="=" aria-label="ស្មើ">=</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ៣) ទាក់ទងតាម Telegram -->
+    <section class="kc-contact">
+      <p class="kc-text">ចុច Telegram ដើម្បីបើក Profile របស់ខ្ញុំ រួចចុច Add to Contacts</p>
+      <div class="kc-float">
+        <!-- បើក Telegram Profile ដោយផ្ទាល់ ដើម្បីឱ្យអ្នកទស្សនាអាចចុច Add to Contacts -->
+        <a id="kc-tg" class="kc-btn"
+           href="https://t.me/reaksmey9822"
+           target="_blank" rel="noopener noreferrer" aria-label="បើក Telegram Profile និង Add to Contacts">
+          <svg class="kc-icon" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M5.2 22.2 41.1 8.3c1.7-.6 3.2.4 2.6 2.9L37.6 39c-.4 1.9-1.6 2.4-3.2 1.4l-9.8-7.2-4.8 4.6c-.5.5-.9.9-1.8.9l.7-10 18.2-16.4c.8-.7-.2-1.1-1.2-.4L13.2 26.1l-9.7-3c-2.1-.7-2.1-2.1 1.7-3.6Z" fill="#fff"/>
+          </svg>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="kc-footer">© ២០២៦ វេបសាយរបស់ខ្ញុំ</footer>
+
+  <script src="js/main.js" defer></script>
+</body>
+</html>
